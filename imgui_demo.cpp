@@ -1442,7 +1442,7 @@ static void DemoWindowWidgetsComboBoxes()
 
         // Simplified one-liner Combo() using an accessor function
         static int item_current_4 = 0;
-        ImGui::Combo("combo 5 (function)", &item_current_4, [](void* data, int n) { return ((const char**)data)[n]; }, items, IM_COUNTOF(items));
+        ImGui::Combo("combo 5 (function)", &item_current_4, [](void* data, int n) { return ImStrv(((const char**)data)[n]); }, items, IM_COUNTOF(items));
 
         ImGui::TreePop();
     }
@@ -5271,7 +5271,7 @@ static void DemoWindowLayout()
             case 2:
                 ImVec4 clip_rect(p0.x, p0.y, p1.x, p1.y); // AddText() takes a ImVec4* here so let's convert.
                 draw_list->AddRectFilled(p0, p1, IM_COL32(90, 90, 120, 255));
-                draw_list->AddText(ImGui::GetFont(), ImGui::GetFontSize(), text_pos, IM_COL32_WHITE, text_str, NULL, 0.0f, &clip_rect);
+                draw_list->AddText(ImGui::GetFont(), ImGui::GetFontSize(), text_pos, IM_COL32_WHITE, text_str, 0.0f, &clip_rect);
                 break;
             }
         }
@@ -8428,7 +8428,7 @@ void ImGui::ShowAboutWindow(bool* p_open)
 //-----------------------------------------------------------------------------
 
 // Demo helper function to select among default colors. See ShowStyleEditor() for more advanced options.
-bool ImGui::ShowStyleSelector(const char* label)
+bool ImGui::ShowStyleSelector(ImStrv label)
 {
     // FIXME: This is a bit tricky to get right as style are functions, they don't register a name nor the fact that one is active.
     // So we keep track of last active one among our limited selection.
@@ -9274,7 +9274,7 @@ struct ExampleAppConsole
                     if (match_len > 0)
                     {
                         data->DeleteChars((int)(word_start - data->Buf), (int)(word_end - word_start));
-                        data->InsertChars(data->CursorPos, candidates[0], candidates[0] + match_len);
+                        data->InsertChars(data->CursorPos, ImStrv(candidates[0], candidates[0] + match_len));
                     }
 
                     // List matches
@@ -9409,8 +9409,8 @@ struct ExampleAppLog
                 {
                     const char* line_start = buf + LineOffsets[line_no];
                     const char* line_end = (line_no + 1 < LineOffsets.Size) ? (buf + LineOffsets[line_no + 1] - 1) : buf_end;
-                    if (Filter.PassFilter(line_start, line_end))
-                        ImGui::TextUnformatted(line_start, line_end);
+                    if (Filter.PassFilter(ImStrv(line_start, line_end)))
+                        ImGui::TextUnformatted(ImStrv(line_start, line_end));
                 }
             }
             else
@@ -9436,7 +9436,7 @@ struct ExampleAppLog
                     {
                         const char* line_start = buf + LineOffsets[line_no];
                         const char* line_end = (line_no + 1 < LineOffsets.Size) ? (buf + LineOffsets[line_no + 1] - 1) : buf_end;
-                        ImGui::TextUnformatted(line_start, line_end);
+                        ImGui::TextUnformatted(ImStrv(line_start, line_end));
                     }
                 }
                 clipper.End();
@@ -9741,7 +9741,7 @@ static void ShowExampleAppLongText(bool* p_open)
     {
     case 0:
         // Single call to TextUnformatted() with a big buffer
-        ImGui::TextUnformatted(log.begin(), log.end());
+        ImGui::TextUnformatted(ImStrv(log.begin(), log.end()));
         break;
     case 1:
         {
@@ -11284,7 +11284,7 @@ void ImGui::ShowAboutWindow(bool*) {}
 void ImGui::ShowDemoWindow(bool*) {}
 void ImGui::ShowUserGuide() {}
 void ImGui::ShowStyleEditor(ImGuiStyle*) {}
-bool ImGui::ShowStyleSelector(const char*) { return false; }
+bool ImGui::ShowStyleSelector(ImStrv) { return false; }
 
 #endif // #ifndef IMGUI_DISABLE_DEMO_WINDOWS
 
